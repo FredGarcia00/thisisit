@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Video, Mail, Chrome } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, signInWithGoogle } from '@/lib/auth';
 import { toast } from 'sonner';
@@ -19,6 +19,33 @@ export default function SignIn() {
     password: '',
   });
   const router = useRouter();
+
+  // Handle error messages from URL parameters
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const error = searchParams.get('error');
+    
+    if (error) {
+      switch (error) {
+        case 'client_error':
+          toast.error('Authentication service is not available. Please try again later.');
+          break;
+        case 'callback_error':
+          toast.error('Failed to complete authentication. Please try again.');
+          break;
+        case 'profile_error':
+          toast.error('Failed to load user profile. Please try again.');
+          break;
+        case 'profile_creation_error':
+          toast.error('Failed to create user profile. Please try again.');
+          break;
+        default:
+          toast.error('An error occurred during sign in. Please try again.');
+      }
+      // Clear the error from URL
+      window.history.replaceState({}, '', '/auth/signin');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

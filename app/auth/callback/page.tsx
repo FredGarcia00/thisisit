@@ -9,6 +9,12 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
+      if (!supabase) {
+        console.error('Supabase client is not initialized');
+        router.push('/auth/signin?error=client_error');
+        return;
+      }
+
       const { data, error } = await supabase.auth.getSession();
       
       if (error) {
@@ -19,20 +25,32 @@ export default function AuthCallback() {
 
       if (data.session) {
         // Check if profile exists, create if not
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id')
           .eq('id', data.session.user.id)
           .single();
 
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Profile check error:', profileError);
+          router.push('/auth/signin?error=profile_error');
+          return;
+        }
+
         if (!profile) {
-          await supabase
+          const { error: insertError } = await supabase
             .from('profiles')
             .insert({
               id: data.session.user.id,
               full_name: data.session.user.user_metadata.full_name || data.session.user.email,
               username: data.session.user.email?.split('@')[0] || 'user',
             });
+
+          if (insertError) {
+            console.error('Profile creation error:', insertError);
+            router.push('/auth/signin?error=profile_creation_error');
+            return;
+          }
         }
 
         router.push('/dashboard');
