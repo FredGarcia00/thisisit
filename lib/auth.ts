@@ -8,7 +8,22 @@ export interface AuthState {
   loading: boolean;
 }
 
+class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AuthError';
+  }
+}
+
+function checkSupabaseClient() {
+  if (!supabase) {
+    throw new AuthError('Authentication service is not available');
+  }
+}
+
 export async function signUp(email: string, password: string, fullName: string) {
+  checkSupabaseClient();
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -38,6 +53,8 @@ export async function signUp(email: string, password: string, fullName: string) 
 }
 
 export async function signIn(email: string, password: string) {
+  checkSupabaseClient();
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -48,6 +65,8 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signInWithGoogle() {
+  checkSupabaseClient();
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -60,17 +79,23 @@ export async function signInWithGoogle() {
 }
 
 export async function signOut() {
+  checkSupabaseClient();
+
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
 }
 
 export async function getCurrentUser() {
+  checkSupabaseClient();
+
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error) throw error;
   return user;
 }
 
 export async function getUserProfile(userId: string) {
+  checkSupabaseClient();
+
   const { data, error } = await supabase
     .from('profiles')
     .select('*')

@@ -15,20 +15,25 @@ export default function AuthCallback() {
         return;
       }
 
-      const { data, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Auth callback error:', error);
-        router.push('/auth/signin?error=callback_error');
-        return;
-      }
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Auth callback error:', sessionError);
+          router.push('/auth/signin?error=callback_error');
+          return;
+        }
 
-      if (data.session) {
-        // Check if profile exists, create if not
+        if (!session) {
+          router.push('/auth/signin');
+          return;
+        }
+
+        // Check if profile exists
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id')
-          .eq('id', data.session.user.id)
+          .eq('id', session.user.id)
           .single();
 
         if (profileError && profileError.code !== 'PGRST116') {
@@ -37,13 +42,14 @@ export default function AuthCallback() {
           return;
         }
 
+        // Create profile if it doesn't exist
         if (!profile) {
           const { error: insertError } = await supabase
             .from('profiles')
             .insert({
-              id: data.session.user.id,
-              full_name: data.session.user.user_metadata.full_name || data.session.user.email,
-              username: data.session.user.email?.split('@')[0] || 'user',
+              id: session.user.id,
+              full_name: session.user.user_metadata.full_name || session.user.email,
+              username: session.user.email?.split('@')[0] || 'user',
             });
 
           if (insertError) {
@@ -54,8 +60,9 @@ export default function AuthCallback() {
         }
 
         router.push('/dashboard');
-      } else {
-        router.push('/auth/signin');
+      } catch (error) {
+        console.error('Unexpected error during auth callback:', error);
+        router.push('/auth/signin?error=unexpected_error');
       }
     };
 
