@@ -198,3 +198,28 @@ export async function getUserProfile(userId: string) {
   if (error) throw error;
   return data;
 }
+
+export async function fetchProfile(userId: string) {
+  try {
+    const client = checkSupabaseClient();
+    const { data, error } = await client
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      throw new AuthServiceError(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof AuthServiceError) {
+      throw error;
+    }
+    if (error instanceof SupabaseAuthError) {
+      throw new AuthServiceError(error.message);
+    }
+    throw new AuthServiceError('An unexpected error occurred while fetching profile');
+  }
+}
