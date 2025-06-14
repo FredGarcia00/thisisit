@@ -5,6 +5,13 @@ import { Database } from '@/types/database';
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database service is not available' },
+        { status: 503 }
+      );
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
@@ -22,14 +29,18 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      throw error;
+      console.error('Error fetching videos:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch videos' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ videos });
   } catch (error: any) {
-    console.error('Error fetching videos:', error);
+    console.error('Error in videos GET:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch videos' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -38,6 +49,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database service is not available' },
+        { status: 503 }
+      );
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session) {
@@ -47,11 +65,19 @@ export async function POST(req: NextRequest) {
     const videoData = await req.json();
 
     // Check subscription limits
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('subscription_plan, videos_created_this_month')
       .eq('id', session.user.id)
       .single();
+
+    if (profileError) {
+      console.error('Error fetching profile:', profileError);
+      return NextResponse.json(
+        { error: 'Failed to verify subscription status' },
+        { status: 500 }
+      );
+    }
 
     if (profile?.subscription_plan === 'free' && profile.videos_created_this_month >= 3) {
       return NextResponse.json(
@@ -61,7 +87,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create video record
-    const { data: video, error } = await supabase
+    const { data: video, error: videoError } = await supabase
       .from('videos')
       .insert({
         ...videoData,
@@ -71,23 +97,32 @@ export async function POST(req: NextRequest) {
       .select()
       .single();
 
-    if (error) {
-      throw error;
+    if (videoError) {
+      console.error('Error creating video:', videoError);
+      return NextResponse.json(
+        { error: 'Failed to create video' },
+        { status: 500 }
+      );
     }
 
     // Update user's video count
-    await supabase
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({
         videos_created_this_month: (profile?.videos_created_this_month || 0) + 1
       })
       .eq('id', session.user.id);
 
+    if (updateError) {
+      console.error('Error updating video count:', updateError);
+      // Don't fail the request, just log the error
+    }
+
     return NextResponse.json({ video });
   } catch (error: any) {
-    console.error('Error creating video:', error);
+    console.error('Error in videos POST:', error);
     return NextResponse.json(
-      { error: 'Failed to create video' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
