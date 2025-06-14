@@ -117,70 +117,30 @@ export function EnhancedVideoCreator() {
       setCurrentVideoId(video.id);
       setProgress(20);
 
-      // Generate script
-      toast.info('Generating AI script...');
-      const scriptResponse = await fetch('/api/ai/generate-script', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: formData.prompt,
-          duration: formData.duration,
-          template: templates.find(t => t.id === formData.template)?.name
-        })
-      });
-      const { script } = await scriptResponse.json();
+      // Simulate video generation steps
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setProgress(40);
+      toast.info('Processing video...');
 
-      // Create avatar
-      toast.info('Creating AI avatar...');
-      const avatarResponse = await fetch('/api/ai/create-avatar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          style: formData.avatar,
-          description: avatarStyles.find(a => a.id === formData.avatar)?.description
-        })
-      });
-      const { avatar } = await avatarResponse.json();
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setProgress(60);
+      toast.info('Finalizing video...');
 
-      // Generate voiceover
-      toast.info('Generating voiceover...');
-      const voiceResponse = await fetch('/api/ai/generate-voiceover', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: script,
-          voice: formData.voice,
-          language: voiceOptions.find(v => v.id === formData.voice)?.language
-        })
-      });
-      const { voiceover } = await voiceResponse.json();
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setProgress(80);
+      toast.info('Almost done...');
 
-      // Render video
-      toast.info('Rendering video...');
-      const renderResponse = await fetch('/api/ai/render-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          script,
-          avatar_id: avatar.id,
-          voice_audio_url: voiceover.audio_url,
-          template_config: templates.find(t => t.id === formData.template)?.config
-        })
-      });
-      const { video: renderedVideo } = await renderResponse.json();
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setProgress(100);
 
-      // Update video record
+      // Update video record with placeholder data
       await supabase
         .from('videos')
         .update({
           status: 'completed',
-          script_content: script,
-          video_url: renderedVideo.video_url,
-          thumbnail_url: renderedVideo.thumbnail_url
+          script_content: formData.prompt,
+          video_url: 'https://example.com/placeholder-video.mp4',
+          thumbnail_url: 'https://example.com/placeholder-thumbnail.jpg'
         })
         .eq('id', video.id);
 

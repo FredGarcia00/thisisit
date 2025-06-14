@@ -4,25 +4,32 @@ export async function POST(req: NextRequest) {
   try {
     const { script, avatar_id, voice_audio_url, template_config } = await req.json();
 
-    if (!script || !avatar_id) {
-      return NextResponse.json({ error: 'Script and avatar are required' }, { status: 400 });
-    }
+    // Placeholder response
+    return NextResponse.json({
+      video: {
+        video_url: 'https://example.com/placeholder-video.mp4',
+        thumbnail_url: 'https://example.com/placeholder-thumbnail.jpg'
+      }
+    });
 
-    // Mock RunwayML API integration
-    // In production, replace with actual RunwayML API calls
-    const mockVideo = {
-      video_url: `https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`,
-      thumbnail_url: `https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=300&h=533`,
-      duration: 30,
-      format: 'mp4',
-      resolution: '1080x1920', // 9:16 aspect ratio
-      status: 'completed'
-    };
+    /* RunwayML API integration (commented out)
+    const response = await fetch('https://api.runwayml.com/v1/video/render', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RUNWAY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        script,
+        avatar_id,
+        voice_audio_url,
+        template_config
+      })
+    });
 
-    // Simulate longer processing time for video rendering
-    await new Promise(resolve => setTimeout(resolve, 5000));
-
-    return NextResponse.json({ video: mockVideo });
+    const data = await response.json();
+    return NextResponse.json(data);
+    */
   } catch (error: any) {
     console.error('Video rendering error:', error);
     return NextResponse.json(

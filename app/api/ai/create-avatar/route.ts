@@ -4,25 +4,30 @@ export async function POST(req: NextRequest) {
   try {
     const { style, description } = await req.json();
 
-    if (!style) {
-      return NextResponse.json({ error: 'Avatar style is required' }, { status: 400 });
-    }
+    // Placeholder response
+    return NextResponse.json({
+      avatar: {
+        id: 'placeholder-avatar-id',
+        url: 'https://example.com/placeholder-avatar.jpg'
+      }
+    });
 
-    // Mock HeyGen API integration
-    // In production, replace with actual HeyGen API calls
-    const mockAvatar = {
-      id: `avatar_${Date.now()}`,
-      style,
-      description,
-      thumbnail_url: `https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=300&h=400`,
-      heygen_avatar_id: `heygen_${Date.now()}`,
-      status: 'ready'
-    };
+    /* HeyGen API integration (commented out)
+    const response = await fetch('https://api.heygen.com/v1/avatar.create', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.HEYGEN_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        style,
+        description
+      })
+    });
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    return NextResponse.json({ avatar: mockAvatar });
+    const data = await response.json();
+    return NextResponse.json(data);
+    */
   } catch (error: any) {
     console.error('Avatar creation error:', error);
     return NextResponse.json(

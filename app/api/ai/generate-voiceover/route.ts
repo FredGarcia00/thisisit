@@ -4,24 +4,30 @@ export async function POST(req: NextRequest) {
   try {
     const { text, voice, language } = await req.json();
 
-    if (!text || !voice) {
-      return NextResponse.json({ error: 'Text and voice are required' }, { status: 400 });
-    }
+    // Placeholder response
+    return NextResponse.json({
+      voiceover: {
+        audio_url: 'https://example.com/placeholder-audio.mp3'
+      }
+    });
 
-    // Mock ElevenLabs API integration
-    // In production, replace with actual ElevenLabs API calls
-    const mockVoiceover = {
-      audio_url: `https://www.soundjay.com/misc/sounds/magic-chime-02.wav`, // Mock audio URL
-      duration: Math.ceil(text.length / 10), // Rough estimate
-      voice_id: voice,
-      language: language || 'en',
-      status: 'completed'
-    };
+    /* ElevenLabs API integration (commented out)
+    const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.ELEVENLABS_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text,
+        voice_id: voice,
+        model_id: 'eleven_monolingual_v1'
+      })
+    });
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
-    return NextResponse.json({ voiceover: mockVoiceover });
+    const data = await response.json();
+    return NextResponse.json(data);
+    */
   } catch (error: any) {
     console.error('Voiceover generation error:', error);
     return NextResponse.json(
