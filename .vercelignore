@@ -5,6 +5,8 @@ npm-debug.log*
 # Environment files
 .env.local
 .env.*.local
+.env.*
+!.env.example
 
 # Build outputs
 .next
@@ -44,3 +46,7 @@ node_modules/
 
 # Yarn Integrity file
 .yarn-integrity
+
+# Git files
+.git
+.github
