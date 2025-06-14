@@ -1,23 +1,23 @@
 'use client';
 
 import { supabase } from './supabase';
-import { AuthError, User } from '@supabase/supabase-js';
+import { AuthError as SupabaseAuthError, User } from '@supabase/supabase-js';
 
 export interface AuthState {
   user: User | null;
   loading: boolean;
 }
 
-class AuthError extends Error {
+class AuthServiceError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'AuthError';
+    this.name = 'AuthServiceError';
   }
 }
 
 function checkSupabaseClient() {
   if (!supabase) {
-    throw new AuthError('Authentication service is not available');
+    throw new AuthServiceError('Authentication service is not available');
   }
 }
 

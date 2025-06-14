@@ -56,7 +56,7 @@ export default function SignIn() {
       toast.success('Signed in successfully!');
       router.push('/dashboard');
     } catch (error: any) {
-      if (error.name === 'AuthError') {
+      if (error.name === 'AuthServiceError') {
         toast.error(error.message);
       } else {
         toast.error('Failed to sign in. Please try again.');
@@ -72,7 +72,7 @@ export default function SignIn() {
     try {
       await signInWithGoogle();
     } catch (error: any) {
-      if (error.name === 'AuthError') {
+      if (error.name === 'AuthServiceError') {
         toast.error(error.message);
       } else {
         toast.error('Failed to sign in with Google. Please try again.');
