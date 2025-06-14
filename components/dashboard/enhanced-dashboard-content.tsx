@@ -15,6 +15,7 @@ import {
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const stats = [
   { name: 'Total Videos', value: '0', icon: Video },
@@ -82,7 +83,7 @@ export function EnhancedDashboardContent() {
           <CardTitle>Monthly Usage</CardTitle>
           <CardDescription>
             {profile?.subscription_plan === 'free' ? (
-              <>You've used {profile?.videos_created_this_month || 0} of 3 videos in your free plan this month</>
+              <>You&apos;ve used {profile?.videos_created_this_month || 0} of 3 videos in your free plan this month</>
             ) : (
               <>Unlimited videos with your {profile?.subscription_plan} plan</>
             )}
@@ -156,10 +157,11 @@ export function EnhancedDashboardContent() {
                 <div key={video.id} className="flex items-center space-x-4 p-4 border rounded-lg">
                   <div className="relative w-16 h-28 bg-muted rounded-lg overflow-hidden">
                     {video.thumbnail_url ? (
-                      <img 
+                      <Image 
                         src={video.thumbnail_url} 
                         alt={video.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">

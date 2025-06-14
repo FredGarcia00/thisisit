@@ -22,6 +22,7 @@ import {
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/lib/supabase';
+import Image from 'next/image';
 
 interface Template {
   id: string;
