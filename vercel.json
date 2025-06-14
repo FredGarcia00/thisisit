@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "app/api/ai/render-video/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/ai/generate-voiceover/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/ai/create-avatar/route.ts": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/reset-monthly-usage",
+      "schedule": "0 0 1 * *"
+    }
+  ]
+}
