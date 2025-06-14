@@ -1,7 +1,7 @@
 'use client';
 
 import { createClient } from '@supabase/supabase-js';
-import { AuthError as SupabaseAuthError, User } from '@supabase/supabase-js';
+import { AuthError as SupabaseAuthError } from '@supabase/supabase-js';
 
 export interface AuthState {
   user: User | null;
