@@ -85,6 +85,11 @@ export function EnhancedVideoCreator() {
       return;
     }
 
+    if (!supabase) {
+      toast.error('Database service is not available. Please try again later.');
+      return;
+    }
+
     if (profile?.subscription_plan === 'free' && profile.videos_created_this_month >= 3) {
       toast.error('Free plan limit reached. Upgrade to Pro for unlimited videos.');
       return;
@@ -134,7 +139,7 @@ export function EnhancedVideoCreator() {
       setProgress(100);
 
       // Update video record with placeholder data
-      await supabase
+      const { error: updateError } = await supabase
         .from('videos')
         .update({
           status: 'completed',
@@ -144,16 +149,26 @@ export function EnhancedVideoCreator() {
         })
         .eq('id', video.id);
 
+      if (updateError) {
+        console.error('Failed to update video status:', updateError);
+        toast.error('Video created but failed to update status');
+        return;
+      }
+
       toast.success('Video generated successfully!');
     } catch (error: any) {
       console.error('Video generation error:', error);
       toast.error(error.message || 'Failed to generate video');
       
-      if (currentVideoId) {
-        await supabase
+      if (currentVideoId && supabase) {
+        const { error: updateError } = await supabase
           .from('videos')
           .update({ status: 'failed' })
           .eq('id', currentVideoId);
+
+        if (updateError) {
+          console.error('Failed to update video status to failed:', updateError);
+        }
       }
     } finally {
       setIsGenerating(false);
