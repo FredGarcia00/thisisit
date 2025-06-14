@@ -275,11 +275,15 @@ export function EnhancedVideoCreator() {
                     </Badge>
                   )}
                   <div className="flex space-x-4">
-                    <img 
-                      src={template.thumbnail_url} 
-                      alt={template.name}
-                      className="w-16 h-28 object-cover rounded"
-                    />
+                    <div className="relative w-16 h-28">
+                      <Image 
+                        src={template.thumbnail_url} 
+                        alt={template.name}
+                        fill
+                        className="object-cover rounded"
+                        sizes="64px"
+                      />
+                    </div>
                     <div className="flex-1">
                       <h3 className="font-medium mb-1">{template.name}</h3>
                       <p className="text-sm text-muted-foreground mb-2">{template.description}</p>

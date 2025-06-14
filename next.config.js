@@ -2,7 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['images.pexels.com'],
+    domains: [
+      'images.pexels.com',
+      'supabase.co',
+      'supabase.in',
+      'supabase.com',
+      'supabase.io',
+      'supabase.net'
+    ],
     // Disable the built-in image optimization that uses sharp
     unoptimized: true,
   },

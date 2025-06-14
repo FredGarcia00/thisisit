@@ -4,7 +4,7 @@ import { Database } from '@/types/database';
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
+    const supabase = await createServerSupabaseClient();
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
 

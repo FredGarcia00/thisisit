@@ -14,8 +14,8 @@ if (!supabaseAnonKey) {
 }
 
 // Server-side Supabase client
-export const createServerSupabaseClient = () => {
-  const cookieStore = cookies();
+export const createServerSupabaseClient = async () => {
+  const cookieStore = await cookies();
   return createServerClient<Database>(
     supabaseUrl,
     supabaseAnonKey,
